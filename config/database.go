@@ -7,6 +7,7 @@ import (
 	"rent-car-project/utils"
 
 	_ "github.com/lib/pq"
+	migrate "github.com/rubenv/sql-migrate"
 )
 
 var DB *sql.DB
@@ -31,4 +32,8 @@ func ConnectDB() {
 
 	DB = db
 	log.Println("Database connected successfully")
+	
+	migrations := &migrate.FileMigrationSource{
+		Dir: "migrations",
+	}
 }
