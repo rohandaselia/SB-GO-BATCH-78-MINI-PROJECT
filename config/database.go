@@ -23,17 +23,29 @@ func ConnectDB() {
 
 	db, err := sql.Open("postgres", dsn)
 	if err != nil {
-		log.Fatal("Failed to connect to database:", err)
+		log.Fatalf("Failed to connect to database: %v", err)
 	}
 
 	if err := db.Ping(); err != nil {
-		log.Fatal("Failed to ping database:", err)
+		log.Fatalf("Failed to ping database: %v", err)
 	}
 
-	DB = db
 	log.Println("Database connected successfully")
-	
+
 	migrations := &migrate.FileMigrationSource{
 		Dir: "migrations",
 	}
+
+	n, err := migrate.Exec(db, "postgres", migrations, migrate.Up)
+	if err != nil {
+		log.Fatalf("Failed to apply migrations: %v", err)
+	}
+
+	if n > 0 {
+		log.Printf("Applied %d migrations!\n", n)
+	} else {
+		log.Println("Migrations are already up to date.")
+	}
+
+	DB = db
 }
